@@ -135,15 +135,21 @@ def text_detail(request, text_id):
             content = request.POST['content']
             rating = request.POST.get('rating')
 
+            # Check if the user has already left a review
             review, created = Review.objects.get_or_create(text=text, user=user)
-            review.content = content
-            review.rating = rating
-            review.save()
 
-            if created:
-                messages.success(request, 'Your review has been submitted.')
-            else:
+            # If the review exists, update it; otherwise, create a new one
+            if not created:
+                # If review exists, update its content and rating
+                review.content = content
+                review.rating = rating
+                review.save()
                 messages.success(request, 'Your review has been updated.')
+            else:
+                review.content = content
+                review.rating = rating
+                review.save()
+                messages.success(request, 'Your review has been submitted.')
         else:
             messages.error(request, 'You need to be logged in to leave a review.')
             return redirect('login')
