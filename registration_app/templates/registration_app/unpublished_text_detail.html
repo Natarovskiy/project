@@ -1,0 +1,122 @@
+<html>
+<head>
+    <title>Детальный просмотр неопубликованного текста</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .unpublished_text-details {
+            margin-bottom: 20px;
+        }
+        .unpublished_text-photo img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: auto;
+        }
+        .unpublished_text-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a, .pagination span {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            text-decoration: none;
+        }
+        .pagination .current {
+            background-color: #462400;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Детальный просмотр неопубликованного текста</h1>
+
+    <div class="unpublished_text-details">
+        <div class="unpublished_text-photo">
+            {% if unpublished_text.photo %}
+                <img src="{{ unpublished_text.photo.url }}" alt="{{ unpublished_text.title }}">
+            {% endif %}
+        </div>
+        <h3>Описание</h3>
+        <p>{{ unpublished_text.short_description|linebreaksbr}}</p>
+        <h3>Готовка</h3>
+        <p>{{ unpublished_text.full_description|linebreaksbr}}</p>
+        <div class="unpublished_text-meta">
+            <p>Категория: {{ unpublished_text.category }}</p>
+            <p>Автор: {{ unpublished_text.user.username }}</p>
+            <p>Дата создания: {{ unpublished_text.created_at|date:"d M Y H:i" }}</p>
+        </div>
+    </div>
+        
+    <form method="post" action="">
+        {% csrf_token %}
+        <button type="submit" name="publish" value="{{ unpublished_text.id }}">Принять</button>
+        <button type="submit" name="reject" value="{{ unpublished_text.id }}">Отклонить</button>
+    </form>
+
+    {% if texts.has_other_pages %}
+        <div class="pagination">
+            {% if texts.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ texts.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+            {% for num in texts.paginator.page_range %}
+                {% if texts.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > texts.number|add:'-5' and num < texts.number|add:'5' %}
+                    <a href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if texts.has_next %}
+                <a href="?page={{ texts.next_page_number }}">Следующая</a>
+                <a href="?page={{ texts.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>

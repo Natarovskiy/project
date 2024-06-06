@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ text.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .text-details {
+            margin-bottom: 20px;
+        }
+        .text-photo img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: auto;
+        }
+        .text-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+        }
+        .reviews {
+            margin-top: 20px;
+        }
+        .review {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .review-content {
+            margin: 10px 0;
+        }
+        .review-meta {
+            font-size: 0.8em;
+            color: #777;
+        }
+        .add-review {
+            margin-top: 20px;
+        }
+        .add-review textarea {
+            max-width: 98%;
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .add-review button {
+            padding: 10px 20px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .add-review button:hover {
+            background-color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+    </style>
+</head>
+<body>
+    <h1>Подробное описание</h1>
+
+    {% if user %}
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'login' %}">Войти</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+    </div>
+    {% endif %}
+    
+    <h1>{{ text.title }}</h1>
+
+    <div class="text-details">
+        <div class="text-photo">
+            {% if text.photo %}
+                <img src="{{ text.photo.url }}" alt="{{ text.title }}">
+            {% endif %}
+        </div>
+        <h3>Описание</h3>
+        <p>{{ text.short_description|linebreaksbr}}</p>
+        <h3>Готовка</h3>
+        <p>{{ text.full_description|linebreaksbr}}</p>
+        <div class="text-meta">
+            <p>Категория: {{ text.category }}</p>
+            <p>Автор: {{ text.user.username }}</p>
+            <p>Просмотров: {{ text.views }}</p>
+            {% if average_rating is not None %}
+                <p>Средняя оценка: {{ average_rating }}/5</p>
+            {% else %}
+                <p>Оценок пока нет</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user %}
+        <div class="text-actions">
+            {% if user == text.user or user.is_moderator %}
+            <a href="{% url 'edit_text' text.id %}">Редактировать</a> | 
+            <a href="{% url 'delete_text' text.id %}">Удалить</a> |
+            {% endif %}
+            {% if user in text.favorited_by.all %}
+                <form action="{% url 'remove_from_favorites' text.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Убрать из избранного</button>
+                </form>
+            {% else %}
+                <form action="{% url 'add_to_favorites' text.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Добавить в избранное</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="reviews">
+        <h2>Отзывы</h2>
+        {% if text.reviews.all %}
+            {% for review in text.reviews.all %}
+                <div class="review">
+                    <div class="review-content">{{ review.content }}</div>
+                    <div class="review-meta">
+                        <p>Автор: {{ review.user.username }}</p>
+                        <p>Оценка: {{ review.rating }}/5</p>
+                        <p>Дата: {{ review.created_at }}</p>
+                        {% if user.is_moderator or user == review.user %}
+                        <form action="{% url 'delete_review' review.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit">Удалить отзыв</button>
+                        </form>
+                    {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Нет отзывов.</p>
+        {% endif %}
+    </div>
+
+    {% if user %}
+        <div class="add-review">
+            <h2>Добавить отзыв</h2>
+            <form method="post" action="{% url 'text_detail' text.id %}">
+                {% csrf_token %}
+                <textarea name="content" placeholder="Ваш отзыв..." required></textarea>
+                <br>
+                <label for="rating">Оценка: </label>
+                <select name="rating" required>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+                <br><br>
+                <button type="submit">Добавить отзыв</button>
+            </form>
+        </div>
+    {% else %}
+        <p>Вы должны <a href="{% url 'login' %}">войти в систему</a>, чтобы оставить отзыв.</p>
+    {% endif %}
+</body>
+</html>

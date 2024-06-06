@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список чатов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+        .chat-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .chat-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .chat-item a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .chat-item p {
+            margin: 5px 0;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список чатов</h1>
+    
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+    
+    <ul class="chat-list">
+        {% if chats %}
+            {% for chat in chats %}
+                <li class="chat-item">
+                    <a href="{% url 'chat_detail' chat.id %}">
+                        Чат с {% if chat.user == request.user %}модератором {{ chat.moderator.username }}{% else %}пользователем {{ chat.user.username }}{% endif %}
+                    </a>
+                    <p>Создан: {{ chat.created_at|date:"d M Y, H:i" }}</p>
+                </li>
+            {% endfor %}
+        {% else %}
+            <p>Нет доступных чатов.</p>
+        {% endif %}
+    </ul>
+    {% if user and not user.is_moderator %}
+        {% if not chats %}
+            <form action="{% url 'create_chat' moderator_id=request.user.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Начать новый чат</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

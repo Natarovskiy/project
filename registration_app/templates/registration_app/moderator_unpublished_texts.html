@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Неопубликованные тексты - Модератор</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        .card {
+            width: calc(20% - 20px);
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-right: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .card-content {
+            padding: 10px;
+        }
+        
+        .card-title {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card-details {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .card {
+                width: calc(25% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 992px) {
+            .card {
+                width: calc(33.33% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .card {
+                width: calc(50% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 576px) {
+            .card {
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Неопубликованные тексты</h1>
+
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+
+    <h2>Список неопубликованных текстов</h2>
+    <div class="cards">
+        {% if unpublished_texts %}
+            {% for text in unpublished_texts %}
+                <div class="card">
+                    {% if text.photo %}
+                        <img src="{{ text.photo.url }}" alt="{{ text.title }}">
+                    {% endif %}
+                    <div class="card-content">
+                        <div class="card-title">
+                            <a href="{% url 'unpublished_text_detail' text.id %}">{{ text.title }}</a>
+                        </div>
+                        <div class="card-details">
+                            <p>{{ text.short_description }}</p>
+                            <p>Автор: {{ text.user.username }}</p>
+                            <p>Создано: {{ text.created_at|date:"d M Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Нет неопубликованных текстов.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

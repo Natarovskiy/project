@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали чата</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .delete-button {
+            padding: 10px;
+            background-color: red;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .delete-button:hover {
+            background-color: darkred;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .messages {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .message .sender {
+            font-weight: bold;
+        }
+        .message .timestamp {
+            color: #777;
+            font-size: 0.9em;
+        }
+        .message .text {
+            margin-top: 5px;
+        }
+        .message-form {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-form textarea {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .message-form button {
+            padding: 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .message-form button:hover {
+            background-color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+    </style>
+</head>
+<body>
+    <h1>Чат с {{ chat.moderator.username }}</h1>
+
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+
+    <div class="chat-container">
+        <div class="messages">
+            {% for message in chat.messages.all %}
+                <div class="message">
+                    <div class="sender">{{ message.sender.username }}</div>
+                    <div class="timestamp">{{ message.created_at }}</div>
+                    <div class="text">{{ message.text }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="message-form">
+            <form method="post">
+                {% csrf_token %}
+                <textarea name="text" rows="3" placeholder="Введите ваше сообщение..."></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+        
+        <form action="{% url 'delete_chat' chat.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="delete-button">Удалить чат</button>
+        </form>
+        
+    </div>
+</body>
+</html>

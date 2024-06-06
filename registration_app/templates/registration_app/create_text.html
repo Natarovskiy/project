@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Создать новый текст</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #462400;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="file"],
+        .form-container select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-container textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #462400;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+        .select-custom-width {
+            width: calc(100% - 22px);
+        }
+    </style>
+</head>
+<body>
+    <h1>Создать новый текст</h1>
+
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+
+    <div class="form-container">
+        <form action="{% url 'create_text' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="title">Заголовок:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="short_description">Краткое описание:</label>
+            <input type="text" id="short_description" name="short_description">
+
+            <label for="full_description">Полное описание:</label>
+            <textarea id="full_description" name="full_description" rows="5" required></textarea>
+
+            <label for="photo">Фото:</label>
+            <input type="file" id="photo" name="photo">
+
+            <label for="category">Категория:</label>
+            <select id="category" name="category" required class="select-custom-width">
+                <option value="" disabled selected>Выберите категорию</option>
+                <option value="Завтрак">Завтрак</option>
+                <option value="Обед">Обед</option>
+                <option value="Ужин">Ужин</option>
+            </select>
+
+            <button type="submit">Создать текст</button>
+        </form>
+    </div>
+</body>
+</html>

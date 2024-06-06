@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Недействительный токен</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .error-message {
+            color: #ff0000;
+            margin-top: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #5e3f28;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-link:hover {
+            background-color: #462400;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ошибка</h1>
+    <h2>Недействительный токен</h2>
+    <p class="error-message">К сожалению, ваш токен недействителен или истек. Пожалуйста, попробуйте снова или свяжитесь с поддержкой.</p>
+    <a href="{% url 'login' %}" class="back-link">Вернуться на страницу входа</a>
+</body>
+</html>

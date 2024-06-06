@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Удаление текста</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .confirmation {
+            margin-bottom: 20px;
+        }
+        .confirmation p {
+            margin-bottom: 10px;
+        }
+        .confirmation button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .confirmation button:hover {
+            background-color: #462400;
+        }
+    </style>
+</head>
+<body>
+    <h1>Подтверждение удаления текста</h1>
+    <div class="confirmation">
+        <p>Вы уверены, что хотите удалить текст "{{ text.title }}"?</p>
+        <form action="{% url 'delete_text' text_id=text.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Да, удалить</button>
+        </form>
+        <a href="{% url 'text_detail' text.id %}">Отмена</a>
+    </div>
+</body>
+</html>

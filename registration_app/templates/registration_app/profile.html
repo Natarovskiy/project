@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профиль пользователя</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1700px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4ede6;
+            color: #3e3e3e;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: #462400;
+        }
+        .profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .profile img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+        .profile-info {
+            font-size: 1.2em;
+        }
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 10px;
+        }
+        .menu form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .menu input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .menu button {
+            padding: 5px 10px;
+            background-color: #5e3f28;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            background-color: #462400;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        .card {
+            width: calc(20% - 20px);
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-right: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .card-content {
+            padding: 10px;
+        }
+        
+        .card-title {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card-details {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .card {
+                width: calc(25% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 992px) {
+            .card {
+                width: calc(33.33% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .card {
+                width: calc(50% - 20px);
+            }
+        }
+        
+        @media screen and (max-width: 576px) {
+            .card {
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Профиль пользователя</h1>
+
+    <div class="menu">
+        <a href="{% url 'success' %}">Главная</a> | 
+        <a href="{% url 'create_text' %}">Новый пост</a> | 
+        <a href="{% url 'profile' %}">Профиль</a> | 
+        <a href="{% url 'all_favorite_texts' %}">Избранное</a> | 
+        <a href="{% url 'chat_list' %}">Поддержка</a> | 
+        <form action="{% url 'search_results' %}" method="get" style="display:inline;">
+            <input type="text" name="search_query" placeholder="Поиск..." />
+            <button type="submit">Поиск</button>
+        </form>
+        {% if user.is_moderator %}
+            <a href="{% url 'moderator_unpublished_texts' %}">Страница модератора</a><br>
+        {% endif %}
+    </div>
+
+    <div class="profile">
+        {% if user.profile_photo %}
+            <img src="{{ user.profile_photo.url }}" alt="{{ user.username }}">
+        {% endif %}
+        
+        <div class="profile-info">
+            <p>Имя пользователя: {{ user.username }}</p>
+            <p>Email: {{ user.email }}</p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="profile_photo">
+                <button type="submit">Изменить фото профиля</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{% url 'change_password' %}">Сменить пароль</a> | 
+    <a href="{% url 'logout' %}">Выход</a> | 
+
+    <h2>Мои опубликованные посты</h2>
+    <div class="cards">
+        {% if texts_page_obj %}
+            {% for text in texts_page_obj %}
+                <div class="card">
+                    {% if text.photo %}
+                        <img src="{{ text.photo.url }}" alt="{{ text.title }}">
+                    {% endif %}
+                    <div class="card-content">
+                        <div class="card-title"><a href="{% url 'text_detail' text.id %}">{{ text.title }}</a></div>
+                        <div class="card-details">
+                            {% if text.average_rating %}
+                                Средняя оценка: {{ text.average_rating|floatformat:1 }}/5
+                            {% else %}
+                                Оценок пока нет
+                            {% endif %}
+                            - {{ text.views }} просмотров
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if show_view_all_texts_button %}
+                <a href="{% url 'all_texts' %}">Все посты</a>
+            {% endif %}
+        {% else %}
+            <p>Нет опубликованных текстов.</p>
+        {% endif %}
+    </div>
+
+    <h2>Мои отзывы</h2>
+    <div class="cards">
+        {% if reviews_page_obj %}
+            {% for review in reviews_page_obj %}
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-title">
+                            <a href="{% url 'text_detail' review.text.id %}">{{ review.text.title }}</a>
+                        </div>
+                        <div class="card-details">
+                            <p>{{ review.content }}</p>
+                            Рейтинг: {{ review.rating }}/5
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if show_view_all_reviews_button %}
+                <a href="{% url 'all_reviews' %}">Все отзывы</a>
+            {% endif %}
+        {% else %}
+            <p>Нет отзывов.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
