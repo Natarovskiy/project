@@ -213,7 +213,7 @@ def success(request):
 
     most_viewed_texts = Text.objects.order_by('-views')[:5]
 
-    top_rated_texts = Text.objects.annotate(avg_rating=Avg('reviews__rating')).order_by('-avg_rating')[:5]
+    top_rated_texts = Text.objects.annotate(avg_rating=Avg('reviews__rating')).order_by('-avg_rating', '-id')[:5]
 
     for category, category_texts in texts_by_category.items():
         for text in category_texts:
