@@ -141,7 +141,7 @@
             <p>Автор: {{ text.user.username }}</p>
             <p>Просмотров: {{ text.views }}</p>
             {% if average_rating is not None %}
-                <p>Средняя оценка: {{ average_rating }}/5</p>
+                <p>Средняя оценка: {{ average_rating|floatformat:1 }}/5</p>
             {% else %}
                 <p>Оценок пока нет</p>
             {% endif %}

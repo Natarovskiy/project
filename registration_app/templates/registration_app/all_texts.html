@@ -177,7 +177,7 @@
                         <div class="card-title"><a href="{% url 'text_detail' text.id %}">{{ text.title }}</a></div>
                         <div class="card-details">
                             {% if text.average_rating %}
-                                Средний рейтинг: {{ text.average_rating }}/5
+                                Средний рейтинг: {{ text.average_rating|floatformat:1 }}/5
                             {% else %}
                                 Нет рейтингов
                             {% endif %}

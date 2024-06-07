@@ -182,7 +182,7 @@
                         <div class="card-title">{{ text.title }}</div>
                         <div class="card-details">
                             {% if text.average_rating %}
-                                Рейтинг: {{ text.average_rating }}/5
+                                Рейтинг: {{ text.average_rating|floatformat:1 }}/5
                             {% else %}
                                 Оценок пока нет
                             {% endif %}
@@ -210,7 +210,7 @@
                         <div class="card-title">{{ text.title }}</div>
                         <div class="card-details">
                             {% if text.average_rating %}
-                                Рейтинг: {{ text.average_rating }}/5
+                                Рейтинг: {{ text.average_rating|floatformat:1 }}/5
                             {% else %}
                                 Оценок пока нет
                             {% endif %}
@@ -238,7 +238,7 @@
                         <div class="card-title">{{ text.title }}</div>
                         <div class="card-details">
                             {% if text.average_rating %}
-                                Рейтинг: {{ text.average_rating }}/5
+                                Рейтинг: {{ text.average_rating|floatformat:1 }}/5
                             {% else %}
                                 Оценок пока нет
                             {% endif %}
@@ -268,7 +268,7 @@
                             <div class="card-title">{{ text.title }}</div>
                             <div class="card-details">
                                 {% if text.average_rating %}
-                                    Рейтинг: {{ text.average_rating }}/5
+                                    Рейтинг: {{ text.average_rating|floatformat:1 }}/5
                                 {% else %}
                                     Оценок пока нет
                                 {% endif %}
